@@ -1,42 +1,70 @@
 <!doctype html>
 <html ng-app="cryptoApp">
+
 <head>
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js"></script>
-	<script src="crhistory.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.6/angular.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <script src="crhistory.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-	<h2>CrHistory </h2>
+    <div class=container>
+        <h2>CrHistory </h2>
+        <div ng-controller="TransactionListController as transactionsList">
+            <span>Total EUR invested {{transactionsList.totalInvested()}}</span></br>
+            <span>Total EUR gained {{transactionsList.totalGained()}}</span></br>
+            <h3>Portfolio composition</h3>
+            <button class="btn btn-primary" type="button" ng-click='transactionsList.refreshPrices()'>Refresh prices</button>
+            <p ng-repeat="crypto in transactionsList.calcUniqueCryptos()">
+                <span>{{transactionsList.calcCryptoBalance(crypto)}} {{crypto}} @
+					  {{transactionsList.getPrice(crypto)}}
+					  = {{transactionsList.getWorth(transactionsList.calcCryptoBalance(crypto), transactionsList.getPrice(crypto))}}
+				</span>
+            </p>
 
-	<div ng-controller="TransactionListController as transactionsList">
-		<span>Total EUR invested {{transactionsList.totalInvested()}}</span></br>
-		<span>Total EUR gained {{transactionsList.totalGained()}}</span></br>
-		<span>Portfolio composition</span>
-		<input class="btn-primary" type="submit" ng-click='transactionsList.getPrice("ETH")' value="Refresh prices">
-		<ul class="unstyled">
-			<li ng-repeat="crypto in transactionsList.calcUniqueCryptos()">
-				<span>{{crypto}} : {{transactionsList.calcCryptoBalance(crypto)}}</span>
-			</li>
-		</ul>
 
+            <form ng-submit="transactionsList.addTransaction()">
+                <div class="row">
+                    <div class="col-xs-2">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1">Amount</span>
+                            <input aria-describedby="basic-addon1" type="text" class="form-control form-inline" ng-model="transactionsList.inputAmount" placeholder="example : 100" required>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1">Currency</span>
+                            <input aria-describedby="basic-addon1" type="text" class="form-control form-inline" ng-model="transactionsList.inputCurr" placeholder="example : EUR" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1">Amount</span>
+                            <input aria-describedby="basic-addon1" type="text" class="form-control form-inline" ng-model="transactionsList.outputAmount" placeholder="example : 0.3" required>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon1">Currency</span>
+                            <input aria-describedby="basic-addon1" type="text" class="form-control form-inline" ng-model="transactionsList.outputCurr" placeholder="example : ETH" required>
+                        </div>
+                    </div>
 
-		<form ng-submit="transactionsList.addTransaction()">
-			<input type="text" ng-model="transactionsList.inputAmount"  size="5"
-			placeholder="amount" required >
-			<input type="text" ng-model="transactionsList.inputCurr"  size="5"
-			placeholder="currency" required>
-			<span>-></span>
-			<input type="text" ng-model="transactionsList.outputAmount"  size="5"
-			placeholder="amount" required>
-			<input type="text" ng-model="transactionsList.outputCurr"  size="5"
-			placeholder="currency" required>
-			<input class="btn-primary" type="submit" value="Add transaction">
-		</form>
-		<span>Transaction history : {{transactionsList.transactions.length}} recorded transactions</span>
-		<ul class="unstyled">
-			<li ng-repeat="transaction in transactionsList.transactions">
-				<span>{{transaction.inAm}} {{transaction.inCurr}} -> {{transaction.outAm}} {{transaction.outCurr}}</span>
-			</li>
-		</ul>
-	</div>
+                </div>
+                <button class="btn btn-primary" type="submit">Add transaction</button>
+
+            </form>
+            <span>Transaction history : {{transactionsList.transactions.length}} recorded transactions</span>
+            <p ng-repeat="transaction in transactionsList.transactions">
+                <span>{{transaction.inAm}} {{transaction.inCurr}} -> {{transaction.outAm}} {{transaction.outCurr}}
+					  Rate : {{transactionsList.getRate(transaction.inAm, transaction.outAm)}}
+				</span>
+            </p>
+        </div>
+    </div>
 </body>
+
 </html>
